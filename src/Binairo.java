@@ -24,6 +24,12 @@ public class Binairo {
         drawLine();
 
         int[] arr = getRandomStartNode(state);
+        backtrack(arr[0], arr[1], state);
+
+        drawLine();
+        System.out.println("Backtrack Board: \n");
+        state.printBoard();
+        drawLine();
 
         long tEnd = System.nanoTime();
         System.out.println("Total time: " + (tEnd - tStart) / 1000000000.000000000);
@@ -146,7 +152,7 @@ public class Binairo {
     }
 
     private boolean isFinished(State state) {
-        return allAssigned(state) && isConsistent(state);
+        return allAssigned(state) && checkNumberOfCircles(state) && checkAdjacency(state) && checkIfUnique(state);
     }
 
     private boolean isConsistent(State state) {
@@ -175,5 +181,55 @@ public class Binairo {
         return arr;
     }
 
-    
+    private void backtrack(int row, int col, State state) {
+
+        if (isFinished(state)) {
+            return;
+        }
+
+        if (state.getBoard().get(row).get(col).equals("E")) {
+
+            state.setIndexBoard(row, col, "w");
+            if (isConsistent(state)) {
+                if (row + 1 < state.getN()) {
+                    backtrack(row + 1, col, state);
+                }
+                if (row - 1 >= 0) {
+                    backtrack(row - 1, col, state);
+                }
+                if (col + 1 < state.getN()) {
+                    backtrack(row, col + 1, state);
+                }
+                if (col - 1 >= 0) {
+                    backtrack(row, col - 1, state);
+                }
+            }
+
+            if (isFinished(state)) {
+                return;
+            }
+
+            state.setIndexBoard(row, col, "b");
+            if (isConsistent(state)) {
+                if (row + 1 < state.getN()) {
+                    backtrack(row + 1, col, state);
+                }
+                if (row - 1 >= 0) {
+                    backtrack(row - 1, col, state);
+                }
+                if (col + 1 < state.getN()) {
+                    backtrack(row, col + 1, state);
+                }
+                if (col - 1 >= 0) {
+                    backtrack(row, col - 1, state);
+                }
+            }
+
+            if (isFinished(state)) {
+                return;
+            }
+
+            state.setIndexBoard(row, col, "E");
+        }
+    }
 }
