@@ -21,6 +21,10 @@ public class State {
         this.n = board.size();
     }
 
+    public int getN() {
+        return n;
+    }
+
     public ArrayList<ArrayList<String>> getBoard() {
         return board;
     }
