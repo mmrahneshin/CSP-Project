@@ -23,7 +23,7 @@ public class Binairo {
         state.printBoard();
         drawLine();
 
-        int[] arr = getRandomStartNode(state);
+        int[] arr = getEmptyNode(state);
         backtrack(arr[0], arr[1], state);
 
         drawLine();
@@ -152,7 +152,7 @@ public class Binairo {
     }
 
     private boolean isFinished(State state) {
-        return allAssigned(state) && checkNumberOfCircles(state) && checkAdjacency(state) && checkIfUnique(state);
+        return allAssigned(state) && isConsistent(state);
     }
 
     private boolean isConsistent(State state) {
@@ -166,17 +166,18 @@ public class Binairo {
         System.out.println();
     }
 
-    private int[] getRandomStartNode(State state) {
-        Random generator = new Random();
+    private int[] getEmptyNode(State state) {
         int n = state.getN();
-        int i = generator.nextInt(n);
-        int j = generator.nextInt(n);
-        int[] arr = { i, j };
-        while (!state.getBoard().get(i).get(j).equals("E")) {
-            i = generator.nextInt(n);
-            j = generator.nextInt(n);
-            arr[0] = i;
-            arr[1] = j;
+        int i;
+        int j;
+        int[] arr = new int[2];
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+                if (state.getBoard().get(i).get(j).equals("E")) {
+                    arr[0] = i;
+                    arr[1] = j;
+                }
+            }
         }
         return arr;
     }
@@ -187,49 +188,24 @@ public class Binairo {
             return;
         }
 
-        if (state.getBoard().get(row).get(col).equals("E")) {
-
-            state.setIndexBoard(row, col, "w");
-            if (isConsistent(state)) {
-                if (row + 1 < state.getN()) {
-                    backtrack(row + 1, col, state);
-                }
-                if (row - 1 >= 0) {
-                    backtrack(row - 1, col, state);
-                }
-                if (col + 1 < state.getN()) {
-                    backtrack(row, col + 1, state);
-                }
-                if (col - 1 >= 0) {
-                    backtrack(row, col - 1, state);
-                }
-            }
+        for (String str : state.getDomain().get(row).get(col)) {
 
             if (isFinished(state)) {
                 return;
             }
 
-            state.setIndexBoard(row, col, "b");
+            state.setIndexBoard(row, col, str);
             if (isConsistent(state)) {
-                if (row + 1 < state.getN()) {
-                    backtrack(row + 1, col, state);
-                }
-                if (row - 1 >= 0) {
-                    backtrack(row - 1, col, state);
-                }
-                if (col + 1 < state.getN()) {
-                    backtrack(row, col + 1, state);
-                }
-                if (col - 1 >= 0) {
-                    backtrack(row, col - 1, state);
-                }
+                int[] temp = getEmptyNode(state);
+                backtrack(temp[0], temp[1], state);
             }
 
-            if (isFinished(state)) {
-                return;
-            }
-
-            state.setIndexBoard(row, col, "E");
         }
+
+        if (isFinished(state)) {
+            return;
+        }
+
+        state.setIndexBoard(row, col, "E");
     }
 }

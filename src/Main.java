@@ -19,11 +19,10 @@ public class Main {
                 board.add(new ArrayList<>());
                 domain.add(new ArrayList<>());
                 for (int j = 0; j < n; j++) {
-                    board.get(i).add("E"); //empty
+                    board.get(i).add("E"); // empty
                     domain.get(i).add(new ArrayList<>(Arrays.asList(
                             "w",
-                            "b"
-                    )));
+                            "b")));
                 }
             }
 
@@ -33,17 +32,16 @@ public class Main {
                 int x = reader.nextInt();
                 int z = reader.nextInt();
                 String a = switch (z) {
-                    case 0 -> "W"; //white
-                    case 1 -> "B"; //black
+                    case 0 -> "W"; // white
+                    case 1 -> "B"; // black
                     default -> null;
                 };
 
                 board.get(y).set(x, a);
                 domain.get(y).set(x, new ArrayList<>(List.of(
-                        "n"
-                )));
-                
-            } //Board and Domain initialized
+                        "n")));
+
+            } // Board and Domain initialized
             Binairo binairo = new Binairo(board, domain, n);
             binairo.start();
             reader.close();
