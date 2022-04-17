@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Random;
 
 public class Binairo {
     private final ArrayList<ArrayList<String>> board;
@@ -109,7 +108,7 @@ public class Binairo {
                 int count = 0;
                 for (int k = 0; k < n; k++) {
                     String a = cBoard.get(i).get(k);
-                    if (a.equals(cBoard.get(j).get(k)) && !a.equals("E")) {
+                    if (a.equalsIgnoreCase(cBoard.get(j).get(k)) && !a.equals("E")) {
                         count++;
                     }
                 }
@@ -125,7 +124,8 @@ public class Binairo {
             for (int k = j + 1; k < n; k++) {
                 int count = 0;
                 for (int i = 0; i < n; i++) {
-                    if (cBoard.get(i).get(j).equals(cBoard.get(i).get(k))) {
+                    String a = cBoard.get(i).get(j);
+                    if (a.equalsIgnoreCase(cBoard.get(i).get(k)) && !a.equals("E")) {
                         count++;
                     }
                 }
@@ -195,6 +195,7 @@ public class Binairo {
             }
 
             state.setIndexBoard(row, col, str);
+
             if (isConsistent(state)) {
                 int[] temp = getEmptyNode(state);
                 backtrack(temp[0], temp[1], state);
@@ -207,5 +208,9 @@ public class Binairo {
         }
 
         state.setIndexBoard(row, col, "E");
+    }
+
+    private void MRV_heuristic(State state) {
+
     }
 }
