@@ -323,4 +323,68 @@ public class Binairo {
         arr = getEmptyNode(state);
         return arr;
     }
+
+    private ArrayList<String> LCV_heuristic(State state, int row, int col) {
+        ArrayList<String> arr = new ArrayList<String>();
+        State black = state.copy();
+        State white = state.copy();
+        int blackConstraint = 0;
+        int whiteConstraint = 0;
+
+        white.setIndexBoard(row, col, "w");
+        if (isConsistent(white)) {
+            for (int i = n - 1; i >= 0; i--) {
+                for (int j = n - 1; j >= 0; j--) {
+                    if (white.getBoard().get(i).get(j).equals("E")) {
+
+                        white.setIndexBoard(i, j, "w");
+                        if (!isConsistent(white)) {
+                            whiteConstraint++;
+                        }
+
+                        white.setIndexBoard(i, j, "b");
+                        if (!isConsistent(white)) {
+                            whiteConstraint++;
+                        }
+                        white.setIndexBoard(i, j, "E");
+                    }
+                }
+            }
+        }
+
+        black.setIndexBoard(row, col, "b");
+        if (isConsistent(black)) {
+            for (int i = n - 1; i >= 0; i--) {
+                for (int j = n - 1; j >= 0; j--) {
+                    if (black.getBoard().get(i).get(j).equals("E")) {
+
+                        black.setIndexBoard(i, j, "w");
+                        if (!isConsistent(black)) {
+                            blackConstraint++;
+                        }
+
+                        black.setIndexBoard(i, j, "b");
+                        if (!isConsistent(black)) {
+                            blackConstraint++;
+                        }
+                        black.setIndexBoard(i, j, "E");
+                    }
+                }
+            }
+        }
+
+        if (blackConstraint != 0 || whiteConstraint != 0) {
+
+            if (blackConstraint >= whiteConstraint) {
+                arr.add("w");
+                arr.add("b");
+            } else if (whiteConstraint >= blackConstraint) {
+                arr.add("b");
+                arr.add("a");
+            }
+
+        }
+
+        return arr;
+    }
 }
