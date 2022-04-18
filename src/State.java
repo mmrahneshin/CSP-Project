@@ -36,10 +36,6 @@ public class State {
         domain.get(x).get(y).remove(value);
     }
 
-    public void setDomainEmpty(int x, int y) {
-        domain.get(x).get(y).add("n");
-    }
-
     public ArrayList<ArrayList<ArrayList<String>>> getDomain() {
         return domain;
     }
