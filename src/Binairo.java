@@ -30,19 +30,19 @@ public class Binairo {
         // backtrack
 
         // =======================================================================
-        tStart = System.nanoTime();
+        // tStart = System.nanoTime();
 
-        temp = state.copy();
-        arr = getEmptyNode(temp);
-        backtrack(arr[0], arr[1], temp);
+        // temp = state.copy();
+        // arr = getEmptyNode(temp);
+        // backtrack(arr[0], arr[1], temp);
 
-        drawLine();
-        System.out.println("Backtrack Board: \n");
-        temp.printBoard();
-        drawLine();
+        // drawLine();
+        // System.out.println("Backtrack Board: \n");
+        // temp.printBoard();
+        // drawLine();
 
-        tEnd = System.nanoTime();
-        System.out.println("Total time: " + (tEnd - tStart) / 1000000000.000000000);
+        // tEnd = System.nanoTime();
+        // System.out.println("Total time: " + (tEnd - tStart) / 1000000000.000000000);
         // =======================================================================
 
         // backtrack
@@ -63,7 +63,7 @@ public class Binairo {
         MRV_Backtrack(arr[0], arr[1], temp);
 
         drawLine();
-        System.out.println("Backtrack with MRV Board: \n");
+        System.out.println("MRV backtracking Board: \n");
         temp.printBoard();
         drawLine();
 
@@ -73,6 +73,34 @@ public class Binairo {
         // =======================================================================
 
         // backtrack with MRV_heuristic
+
+        // =======================================================================
+
+        // =======================================================================
+
+        // backtrack with LCV_heuristic
+
+        // =======================================================================
+
+        tStart = System.nanoTime();
+
+        temp = state.copy();
+
+        arr = getEmptyNode(temp);
+
+        LCV_Backtrack(arr[0], arr[1], temp);
+
+        drawLine();
+        System.out.println("LCV backtracking Board: \n");
+        temp.printBoard();
+        drawLine();
+
+        tEnd = System.nanoTime();
+        System.out.println("Total time: " + (tEnd - tStart) / 1000000000.000000000);
+
+        // =======================================================================
+
+        // backtrack with LCV_heuristic
 
         // =======================================================================
     }
@@ -324,67 +352,71 @@ public class Binairo {
         return arr;
     }
 
-    private ArrayList<String> LCV_heuristic(State state, int row, int col) {
-        ArrayList<String> arr = new ArrayList<String>();
+    private void LCV_Backtrack(int row, int col, State state) {
+
+        if (isFinished(state)) {
+            return;
+        }
+
+        LCV_heuristic(state, row, col);
+
+        for (String str : state.getDomain().get(row).get(col)) {
+
+            if (isFinished(state)) {
+                return;
+            }
+
+            state.setIndexBoard(row, col, str);
+
+            if (isConsistent(state)) {
+                int[] temp = getEmptyNode(state);
+                LCV_Backtrack(temp[0], temp[1], state);
+            }
+
+        }
+
+        if (state.getDomain().get(row).get(col).get(0).equals("b")) {
+            state.removeIndexDomain(row, col, "b");
+            state.getDomain().get(row).get(col).add("b");
+        }
+
+        if (isFinished(state)) {
+            return;
+        }
+
+        state.setIndexBoard(row, col, "E");
+    }
+
+    private void LCV_heuristic(State state, int row, int col) {
         State black = state.copy();
         State white = state.copy();
-        int blackConstraint = 0;
-        int whiteConstraint = 0;
-
-        white.setIndexBoard(row, col, "w");
-        if (isConsistent(white)) {
-            for (int i = n - 1; i >= 0; i--) {
-                for (int j = n - 1; j >= 0; j--) {
-                    if (white.getBoard().get(i).get(j).equals("E")) {
-
-                        white.setIndexBoard(i, j, "w");
-                        if (!isConsistent(white)) {
-                            whiteConstraint++;
-                        }
-
-                        white.setIndexBoard(i, j, "b");
-                        if (!isConsistent(white)) {
-                            whiteConstraint++;
-                        }
-                        white.setIndexBoard(i, j, "E");
-                    }
-                }
-            }
-        }
-
+        int whiteConsistency = 2;
+        int blackConsistency = 2;
+        int[] nextNode = new int[2];
         black.setIndexBoard(row, col, "b");
-        if (isConsistent(black)) {
-            for (int i = n - 1; i >= 0; i--) {
-                for (int j = n - 1; j >= 0; j--) {
-                    if (black.getBoard().get(i).get(j).equals("E")) {
+        white.setIndexBoard(row, col, "w");
+        nextNode = getEmptyNode(white);
 
-                        black.setIndexBoard(i, j, "w");
-                        if (!isConsistent(black)) {
-                            blackConstraint++;
-                        }
-
-                        black.setIndexBoard(i, j, "b");
-                        if (!isConsistent(black)) {
-                            blackConstraint++;
-                        }
-                        black.setIndexBoard(i, j, "E");
-                    }
-                }
+        for (String str : state.getDomain().get(nextNode[0]).get(nextNode[1])) {
+            black.setIndexBoard(nextNode[0], nextNode[1], str);
+            white.setIndexBoard(nextNode[0], nextNode[1], str);
+            if (!isConsistent(white)) {
+                whiteConsistency--;
+            }
+            if (!isConsistent(black)) {
+                blackConsistency--;
             }
         }
 
-        if (blackConstraint != 0 || whiteConstraint != 0) {
-
-            if (blackConstraint >= whiteConstraint) {
-                arr.add("w");
-                arr.add("b");
-            } else if (whiteConstraint >= blackConstraint) {
-                arr.add("b");
-                arr.add("a");
-            }
-
+        if (whiteConsistency < blackConsistency) {
+            state.removeIndexDomain(row, col, "w");
+            state.getDomain().get(row).get(col).add("w");
         }
 
-        return arr;
     }
+
+    private void forwardChecking(State state) {
+
+    }
+
 }

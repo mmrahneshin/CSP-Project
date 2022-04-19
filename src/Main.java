@@ -9,7 +9,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        File input = new File("inputs/input2.txt");
+        File input = new File("inputs/input3.txt");
         ArrayList<ArrayList<String>> board = new ArrayList<>();
         ArrayList<ArrayList<ArrayList<String>>> domain = new ArrayList<>();
         try {
