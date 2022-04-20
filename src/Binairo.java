@@ -30,19 +30,19 @@ public class Binairo {
         // backtrack
 
         // =======================================================================
-        // tStart = System.nanoTime();
+        tStart = System.nanoTime();
 
-        // temp = state.copy();
-        // arr = getEmptyNode(temp);
-        // backtrack(arr[0], arr[1], temp);
+        temp = state.copy();
+        arr = getEmptyNode(temp);
+        backtrack(arr[0], arr[1], temp);
 
-        // drawLine();
-        // System.out.println("Backtrack Board: \n");
-        // temp.printBoard();
-        // drawLine();
+        drawLine();
+        System.out.println("Backtrack Board: \n");
+        temp.printBoard();
+        drawLine();
 
-        // tEnd = System.nanoTime();
-        // System.out.println("Total time: " + (tEnd - tStart) / 1000000000.000000000);
+        tEnd = System.nanoTime();
+        System.out.println("Total time: " + (tEnd - tStart) / 1000000000.000000000);
         // =======================================================================
 
         // backtrack
@@ -101,6 +101,34 @@ public class Binairo {
         // =======================================================================
 
         // backtrack with LCV_heuristic
+
+        // =======================================================================
+
+        // =======================================================================
+
+        // backtrack with forward checking and MRV
+
+        // =======================================================================
+
+        tStart = System.nanoTime();
+
+        temp = state.copy();
+
+        arr = MRV_heuristic(temp);
+
+        fowardChecking_with_MRV_backtrack(arr[0], arr[1], temp);
+
+        drawLine();
+        System.out.println("backtracking with forward checking and MRV Board: \n");
+        temp.printBoard();
+        drawLine();
+
+        tEnd = System.nanoTime();
+        System.out.println("Total time: " + (tEnd - tStart) / 1000000000.000000000);
+
+        // =======================================================================
+
+        // backtrack with forward checking and MRV
 
         // =======================================================================
     }
@@ -305,9 +333,10 @@ public class Binairo {
         if (isFinished(state)) {
             return;
         }
+
         if (state.getDomain().get(row).get(col).size() == 0) {
-            state.getDomain().get(row).get(col).add("b");
             state.getDomain().get(row).get(col).add("w");
+            state.getDomain().get(row).get(col).add("b");
         } else if (state.getDomain().get(row).get(col).size() == 1) {
 
             if (state.getDomain().get(row).get(col).get(0).equals("b")) {
@@ -316,6 +345,7 @@ public class Binairo {
                 state.getDomain().get(row).get(col).add("b");
             }
         }
+
         state.setIndexBoard(row, col, "E");
     }
 
@@ -358,7 +388,14 @@ public class Binairo {
             return;
         }
 
-        LCV_heuristic(state, row, col);
+        state.setIndexBoard(row, col, "w");
+        if (isConsistent(state)) {
+            state.setIndexBoard(row, col, "b");
+            if (isConsistent(state)) {
+                LCV_heuristic(state, row, col);
+            }
+
+        }
 
         for (String str : state.getDomain().get(row).get(col)) {
 
@@ -369,15 +406,11 @@ public class Binairo {
             state.setIndexBoard(row, col, str);
 
             if (isConsistent(state)) {
+
                 int[] temp = getEmptyNode(state);
                 LCV_Backtrack(temp[0], temp[1], state);
             }
 
-        }
-
-        if (state.getDomain().get(row).get(col).get(0).equals("b")) {
-            state.removeIndexDomain(row, col, "b");
-            state.getDomain().get(row).get(col).add("b");
         }
 
         if (isFinished(state)) {
@@ -415,8 +448,91 @@ public class Binairo {
 
     }
 
-    private void forwardChecking(State state) {
+    private void fowardChecking_with_MRV_backtrack(int row, int col, State state) {
+        if (isFinished(state)) {
+            return;
+        }
 
+        for (String str : state.getDomain().get(row).get(col)) {
+            if (isFinished(state)) {
+                return;
+            }
+
+            state.setIndexBoard(row, col, str);
+
+            if (isConsistent(state)) {
+
+                if (!forwardChecking(state, row, col)) {
+                    continue;
+                }
+                int[] temp = MRV_heuristic(state);
+                fowardChecking_with_MRV_backtrack(temp[0], temp[1], state);
+            }
+
+        }
+
+        if (isFinished(state)) {
+            return;
+        }
+        if (state.getDomain().get(row).get(col).size() == 0) {
+            state.getDomain().get(row).get(col).add("w");
+            state.getDomain().get(row).get(col).add("b");
+        } else if (state.getDomain().get(row).get(col).size() == 1) {
+
+            if (state.getDomain().get(row).get(col).get(0).equals("b")) {
+                state.getDomain().get(row).get(col).add("w");
+            } else {
+                state.getDomain().get(row).get(col).add("b");
+            }
+        }
+
+        state.setIndexBoard(row, col, "E");
+
+    }
+
+    private boolean forwardChecking(State temp, int row, int col) {
+        // State temp = state.copy();
+
+        for (int i = n - 1; i >= 0; i--) {
+
+            if (temp.getBoard().get(row).get(i).equals("E")) {
+                int countConsistency = 0;
+                temp.setIndexBoard(row, i, "w");
+                if (!isConsistent(temp)) {
+                    countConsistency++;
+                    // temp.removeIndexDomain(row, i, "w");
+                }
+                temp.setIndexBoard(row, i, "b");
+                if (!isConsistent(temp)) {
+                    countConsistency++;
+                    // temp.removeIndexDomain(row, i, "b");
+                }
+                temp.setIndexBoard(row, i, "E");
+                if (countConsistency == 2) {
+                    return false;
+                }
+            }
+
+            if (temp.getBoard().get(i).get(col).equals("E")) {
+                int countConsistency = 0;
+                temp.setIndexBoard(i, col, "w");
+                if (!isConsistent(temp)) {
+                    countConsistency++;
+                    // temp.removeIndexDomain(i, col, "w");
+                }
+                temp.setIndexBoard(i, col, "b");
+                if (!isConsistent(temp)) {
+                    countConsistency++;
+                    // temp.removeIndexDomain(i, col, "b");
+                }
+                temp.setIndexBoard(i, col, "E");
+                if (countConsistency == 2) {
+                    return false;
+                }
+            }
+
+        }
+        return true;
     }
 
 }

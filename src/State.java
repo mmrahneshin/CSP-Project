@@ -66,7 +66,7 @@ public class State {
         for (int i = 0; i < n; i++) {
             ArrayList<ArrayList<String>> row = new ArrayList<>();
             for (int j = 0; j < n; j++) {
-                row.add(new ArrayList<>(Arrays.asList("", "")));
+                row.add(new ArrayList<String>());
             }
             res.add(row);
         }
@@ -74,7 +74,7 @@ public class State {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 for (int k = 0; k < cDomain.get(i).get(j).size(); k++) {
-                    res.get(i).get(j).set(k, cDomain.get(i).get(j).get(k));
+                    res.get(i).get(j).add(cDomain.get(i).get(j).get(k));
                 }
             }
         }
